@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculadora de reservorios · Sergio Solano Romero</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap">
+<style>
+:root{--bg:#0b3a9c;--bg2:#08297a;--panel:#062270;--line:#2a5bd0;--y:#ffd60a;--g:#5aeb78;--ink:#e6efff;--err:#ff9d8a;color-scheme:dark;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#082d84;--bg2:#061f5e;--panel:#051a55;--line:#2450b8}}
+:root[data-theme="dark"]{--bg:#082d84;--bg2:#061f5e;--panel:#051a55;--line:#2450b8}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;font-family:Lato,"Segoe UI",Arial,sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--bg),var(--bg2));line-height:1.45}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 18px 48px}
+.perfil{display:flex;gap:18px;align-items:center;background:var(--panel);border:2px solid var(--line);border-left:6px solid var(--y);border-radius:18px;padding:18px 22px;margin-bottom:26px}
+.ini{flex:none;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:1.35rem;letter-spacing:.02em;color:var(--y);border:3px solid var(--g);background:var(--bg2)}
+.perfil .nom{margin:0;font-size:clamp(1.25rem,3.2vw,1.7rem);font-weight:900;color:var(--y);line-height:1.15}
+.perfil .tit{margin:2px 0 0;font-weight:700;color:var(--g);font-size:1.02rem}
+.perfil .svc{margin:8px 0 0;font-size:.95rem;color:var(--ink);opacity:.95}
+.perfil .svc span{white-space:nowrap}
+.perfil .svc i{font-style:normal;color:var(--g);margin:0 6px}
+@media(max-width:560px){.perfil{flex-direction:column;align-items:flex-start;padding:16px}}
+.rv{margin-top:26px}
+.rv h2.t{margin:0 0 4px;font-size:1.5rem;font-weight:900;color:var(--y)}
+.rv .lead{margin:0 0 18px;color:var(--g)}
+.rv .stack{display:grid;gap:16px}
+.rv svg{width:100%;height:auto;display:block;border:2px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#5aa6ee,#cfe6fb)}
+.rv .dims{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 22px}
+@media(max-width:560px){.rv .dims{grid-template-columns:1fr}}
+.rv .dims div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:6px 0}
+.rv .dims span{opacity:.9}.rv .dims b{color:var(--y);text-align:right}
+.rv .hint{font-size:.85rem;opacity:.85;margin:4px 0 0}
+.pie{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:.9rem;color:var(--ink);opacity:.9}
+.pie b{color:var(--y)}
+h1{margin:0;font-size:clamp(1.7rem,4.5vw,2.6rem);font-weight:900;color:var(--y);letter-spacing:-.01em}
+.sub{margin:6px 0 24px;color:var(--g);font-size:1.05rem}
+.grid{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:20px}
+.card h2{margin:0 0 14px;font-size:1.15rem;color:var(--y)}
+label{display:block;font-weight:700;color:var(--g);font-size:.95rem;margin:12px 0 4px}
+label small{font-weight:400;color:var(--ink);opacity:.8}
+input,select{width:100%;padding:11px 12px;font:inherit;font-size:1.05rem;color:var(--ink);background:var(--bg2);border:2px solid var(--line);border-radius:10px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--y);outline-offset:2px}
+input.bad{border-color:var(--err)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btns{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+button{font:inherit;font-weight:700;border-radius:10px;padding:11px 16px;cursor:pointer;border:2px solid var(--y)}
+.main{background:var(--y);color:#062270;flex:1}
+.ghost{background:transparent;color:var(--y)}
+.opt{margin-top:18px;padding-top:6px;border-top:1px dashed var(--line)}
+.opt h3{margin:12px 0 0;font-size:1rem;color:var(--y)}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.res{grid-template-columns:1fr}}
+.m{border:2px solid var(--g);border-radius:16px;padding:16px;background:var(--bg2)}
+.m.h{border-color:var(--y)}
+.m h3{margin:0;font-size:1.05rem;color:var(--g)}
+.m.h h3{color:var(--y)}
+.big{font-size:3rem;font-weight:900;color:var(--y);line-height:1.1;margin:8px 0 0}
+.m.h .big{color:var(--g)}
+.big span{font-size:1.05rem;font-weight:700;color:var(--ink);margin-left:6px}
+.mes{color:var(--g);font-weight:700;margin:2px 0 10px}
+.m.h .mes{color:var(--y)}
+dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:.95rem}
+dt{opacity:.85}dd{margin:0;font-weight:700;text-align:right}
+.diff{margin-top:16px;padding:12px 16px;border-radius:12px;border:2px solid var(--y);background:var(--panel);font-weight:700;color:var(--y)}
+.diff b{color:var(--g)}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.95rem}
+th,td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--g)}td{font-weight:700}
+.empty{padding:34px 14px;text-align:center;color:var(--g);font-size:1.05rem}
+.msg{color:var(--err);font-weight:700;margin-top:10px;font-size:.95rem}
+details{margin-top:18px}
+summary{cursor:pointer;color:var(--y);font-weight:700}
+.f{font-family:"Courier New",monospace;background:var(--bg2);padding:10px 12px;border-radius:10px;margin:8px 0;font-size:.92rem;overflow-x:auto;white-space:pre}
+.note{font-size:.88rem;opacity:.85;margin:6px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="perfil" aria-label="Autor de la herramienta">
+<div class="ini" aria-hidden="true">SS</div>
+<div>
+<p class="nom">Sergio Solano Romero</p>
+<p class="tit">Ingeniero Agrícola</p>
+<p class="svc"><span>Diseño e instalación de sistemas de riego</span><i>·</i><span>Fertirriego</span><i>·</i><span>Conservación de suelos</span><i>·</i><span>Diseño y construcción de invernaderos</span></p>
+</div>
+</header>
+<h1>Calculadora de reservorios</h1>
+<p class="sub">Dimensiones y volumen de un reservorio troncopiramidal a partir de la demanda, la autonomía y el margen de seguridad</p>
+<section class="rv" id="reservorio" aria-label="Cálculo del reservorio">
+<div class="grid">
+<div class="card" aria-label="Datos del reservorio">
+<h2>Datos del reservorio</h2>
+<label for="rv_vd">Demanda máxima diaria <small>(m³/día)</small></label><input id="rv_vd" inputmode="decimal" placeholder="58,73">
+<label for="rv_aut">Autonomía <small>(días)</small></label><input id="rv_aut" inputmode="decimal" placeholder="10">
+<label for="rv_mar">Margen de seguridad <small>(%)</small></label><input id="rv_mar" inputmode="decimal" placeholder="15">
+<label for="rv_prof">Profundidad <small>(m)</small></label><input id="rv_prof" inputmode="decimal" placeholder="2">
+<label for="rv_tal">Talud (V) <small>(m horizontales por cada 1 m de profundidad; 1 = talud 1:1)</small></label><input id="rv_tal" inputmode="decimal" placeholder="1">
+<div class="opt"><h3>Forma de la base (opcional)</h3>
+<label for="rv_rel">Relación largo : ancho <small>(si la deja vacía se usa 1,8)</small></label><input id="rv_rel" inputmode="decimal" placeholder="1,8">
+<p class="hint">Los datos anteriores no definen la forma por sí solos: con el mismo volumen hay infinitas combinaciones de largo y ancho. Esta relación fija una.</p></div>
+<div class="btns"><button class="main" id="rv_calc">Calcular</button><button class="ghost" id="rv_ej">Cargar ejemplo</button><button class="ghost" id="rv_lim">Limpiar</button></div>
+<div class="msg" id="rv_msg" role="alert"></div>
+</div>
+<div id="rv_out" aria-live="polite"><div class="card"><div class="empty">Ingrese los datos del reservorio para ver el cálculo y el esquema 3D.</div></div></div>
+</div>
+<details class="card" style="margin-top:20px"><summary>Fórmulas del reservorio</summary>
+<div class="f">V diseño = demanda diaria · autonomía · (1 + margen / 100)
+V = (h / 3) · (A base + A boca + √(A base · A boca))
+Largo boca = largo base + 2 · talud · h
+Ancho boca = ancho base + 2 · talud · h</div>
+<p class="note">Se resuelve el ancho de la base que entrega exactamente el volumen de diseño, con la profundidad, el talud y la relación largo : ancho indicados. El volumen corresponde al reservorio lleno hasta el borde, sin bordo libre. Es un dimensionamiento preliminar: no incluye impermeabilización, vertedero, bordo libre, pérdidas por infiltración ni evaporación, ni estudios de suelo y estabilidad de taludes.</p></details>
+</section>
+<footer class="pie">Herramienta elaborada por <b>Sergio Solano Romero</b>, Ingeniero Agrícola. El dimensionamiento es preliminar y no sustituye el diseño técnico, los estudios de suelo ni la revisión de un profesional.</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const num = s => { s=String(s).trim(); if(!s) return NaN; const v=parseFloat(s.replace(",",".")); return isFinite(v)?v:NaN };
+const fm = (v,d=2) => v.toFixed(d).replace(".",",");
+/* ---------- Reservorio ---------- */
+function volTr(W,r,d,z){const L=r*W,A1=L*W,A2=(W+2*z*d)*(L+2*z*d);return d/3*(A1+A2+Math.sqrt(A1*A2))}
+function pill(txt,x,y,col){const w=txt.length*7.4+20;return `<rect x="${(x-w/2).toFixed(1)}" y="${(y-12).toFixed(1)}" width="${w.toFixed(1)}" height="24" rx="12" fill="#062270" stroke="${col}" stroke-width="1.6"/><text x="${x.toFixed(1)}" y="${(y+4.5).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="700" fill="${col}" font-family="Lato,Arial,sans-serif">${txt}</text>`}
+function svg3d(R){
+  const {Lt,Wt,Lb,Wb,d,z}=R, VW=760, VH=440, c=0.866, s=0.5, e=0.3*Math.min(Lt,Wt), t=0.4*d, zd=z*d;
+  const ve=Math.min(3,Math.max(1,0.25*Lt/d)), P=(x,y,zz)=>[(x-y)*c,(x+y)*s-zz*ve];
+  const cs=[[-e,-e,0],[Lt+e,-e,0],[Lt+e,Wt+e,0],[-e,Wt+e,0],[-e,Wt+e,-t],[Lt+e,Wt+e,-t],[Lt+e,-e,-t]].map(p=>P(...p));
+  const xs=cs.map(p=>p[0]), ys=cs.map(p=>p[1]);
+  const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  const k=Math.min((VW-220)/(maxx-minx),(VH-90)/(maxy-miny));
+  const ox=VW/2-(minx+maxx)/2*k, oy=28-miny*k+((VH-90)-(maxy-miny)*k)/2;
+  const T=(x,y,zz)=>{const q=P(x,y,zz);return [ox+q[0]*k,oy+q[1]*k]};
+  const pts=a=>a.map(p=>T(...p).map(v=>v.toFixed(1)).join(",")).join(" ");
+  const rim=[[0,0,0],[Lt,0,0],[Lt,Wt,0],[0,Wt,0]];
+  const floor=[[zd,zd,-d],[zd+Lb,zd,-d],[zd+Lb,zd+Wb,-d],[zd,zd+Wb,-d]];
+  const wallX=[[0,0,0],[0,Wt,0],[zd,zd+Wb,-d],[zd,zd,-d]];
+  const wallY=[[0,0,0],[Lt,0,0],[zd+Lb,zd,-d],[zd,zd,-d]];
+  const h=0.3*d, w=z*h;
+  const water=[[w,w,-h],[Lt-w,w,-h],[Lt-w,Wt-w,-h],[w,Wt-w,-h]];
+  let o=`<svg viewBox="0 0 ${VW} ${VH}" role="img" aria-label="Esquema 3D del reservorio con sus medidas"><defs><clipPath id="rvclip"><polygon points="${pts(rim)}"/></clipPath></defs>`;
+  o+=`<polygon points="${pts([[Lt+e,-e,0],[Lt+e,Wt+e,0],[Lt+e,Wt+e,-t],[Lt+e,-e,-t]])}" fill="#8a5a34"/>`;
+  o+=`<polygon points="${pts([[-e,Wt+e,0],[Lt+e,Wt+e,0],[Lt+e,Wt+e,-t],[-e,Wt+e,-t]])}" fill="#6e4528"/>`;
+  o+=`<polygon points="${pts([[-e,-e,0],[Lt+e,-e,0],[Lt+e,Wt+e,0],[-e,Wt+e,0]])}" fill="#5b9a3f" stroke="#3f7a2b" stroke-width="1.5"/>`;
+  o+=`<g clip-path="url(#rvclip)"><polygon points="${pts(rim)}" fill="#3b2916"/>`;
+  o+=`<polygon points="${pts(floor)}" fill="#5a3d22"/>`;
+  o+=`<polygon points="${pts(wallX)}" fill="#a77544"/><polygon points="${pts(wallY)}" fill="#8a5c32"/>`;
+  o+=`<polygon points="${pts(water)}" fill="#2f8de0" fill-opacity=".66" stroke="#bfe3ff" stroke-width="1.5"/>`;
+  o+=`<polygon points="${pts(floor)}" fill="none" stroke="#ffd60a" stroke-width="2" stroke-dasharray="6 4"/></g>`;
+  o+=`<polygon points="${pts(rim)}" fill="none" stroke="#ffd60a" stroke-width="2.6" stroke-linejoin="round"/>`;
+  const a=T(Lt,0,0), b=T(Lt,0,-d);
+  o+=`<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="#fff" stroke-width="2.4"/>`;
+  [a,b].forEach(q=>{o+=`<line x1="${(q[0]-7).toFixed(1)}" y1="${q[1].toFixed(1)}" x2="${(q[0]+7).toFixed(1)}" y2="${q[1].toFixed(1)}" stroke="#fff" stroke-width="2.4"/>`});
+  const tp="Prof. "+fm(d,2)+" m"; o+=pill(tp,a[0]+(tp.length*7.4+20)/2+10,(a[1]+b[1])/2,"#ffd60a");
+  let q=T(Lt/2,Wt+e*0.55,0); o+=pill("Largo boca "+fm(Lt,2)+" m",q[0],q[1],"#5aeb78");
+  q=T(Lt+e*0.55,Wt/2,0); o+=pill("Ancho boca "+fm(Wt,2)+" m",q[0],q[1],"#5aeb78");
+  q=T(zd+Lb/2,zd,-d); o+=pill("Largo base "+fm(Lb,2)+" m",q[0],q[1],"#ffd60a");
+  q=T(zd,zd+Wb/2,-d); o+=pill("Ancho base "+fm(Wb,2)+" m",q[0],q[1],"#ffd60a");
+  q=T(Lt*0.3,zd/2,-d/2); o+=pill("Talud "+fm(z,2)+" H : 1 V",q[0],q[1],"#5aeb78");
+  o+=`<text x="${VW-12}" y="${VH-10}" text-anchor="end" font-size="11" fill="#0a2a6b" font-family="Lato,Arial,sans-serif">Esquema ilustrativo, profundidad exagerada</text>`;
+  return o+"</svg>";
+}
+function reservorio(show){
+  const ids=["rv_vd","rv_aut","rv_mar","rv_prof","rv_tal","rv_rel"];
+  ids.forEach(i=>$(i).classList.remove("bad"));
+  $("rv_msg").textContent="";
+  const vd=num($("rv_vd").value), aut=num($("rv_aut").value), mar=num($("rv_mar").value), d=num($("rv_prof").value), z=num($("rv_tal").value);
+  let r=num($("rv_rel").value); if(isNaN(r)) r=1.8;
+  const vacio='<div class="card"><div class="empty">Ingrese los datos del reservorio para ver el cálculo y el esquema 3D.</div></div>';
+  const campos=[["rv_vd",vd>0],["rv_aut",aut>0],["rv_mar",mar>=0],["rv_prof",d>0],["rv_tal",z>0],["rv_rel",r>=1]];
+  const malos=campos.filter(c=>!c[1]);
+  if(malos.length){
+    if(show){malos.forEach(c=>$(c[0]).classList.add("bad")); $("rv_msg").textContent=(isNaN(r)||r<1)&&!isNaN(num($("rv_rel").value))?"La relación largo : ancho debe ser 1 o mayor.":"Complete todos los datos con valores válidos (mayores que 0; el margen puede ser 0)."}
+    $("rv_out").innerHTML=vacio; return;
+  }
+  const V0=vd*aut, V=V0*(1+mar/100);
+  if(V<=4/3*z*z*d*d*d){
+    $("rv_prof").classList.add("bad"); $("rv_tal").classList.add("bad");
+    $("rv_msg").textContent="Con esa profundidad y ese talud el reservorio sería más grande que el volumen requerido. Reduzca la profundidad o el talud.";
+    $("rv_out").innerHTML=vacio; return;
+  }
+  let lo=0, hi=1; while(volTr(hi,r,d,z)<V && hi<1e6) hi*=2;
+  for(let i=0;i<80;i++){const mid=(lo+hi)/2; if(volTr(mid,r,d,z)<V) lo=mid; else hi=mid;}
+  const Wb=(lo+hi)/2, Lb=r*Wb, Lt=Lb+2*z*d, Wt=Wb+2*z*d;
+  const R={Lt,Wt,Lb,Wb,d,z};
+  $("rv_out").innerHTML=`<div class="stack">
+  <div class="m h"><h3>Volumen total de almacenamiento</h3><div class="big">${fm(V,1)}<span>m³</span></div><div class="mes">${fm(V*1000,0)} litros · ${fm(vd,2)} m³/día × ${fm(aut,0)} días + ${fm(mar,0)} % de margen</div></div>
+  ${svg3d(R)}
+  <div class="m"><h3>Medidas del reservorio</h3><div class="dims">
+  <div><span>Largo de la boca</span><b>${fm(Lt,2)} m</b></div><div><span>Ancho de la boca</span><b>${fm(Wt,2)} m</b></div>
+  <div><span>Largo de la base</span><b>${fm(Lb,2)} m</b></div><div><span>Ancho de la base</span><b>${fm(Wb,2)} m</b></div>
+  <div><span>Profundidad</span><b>${fm(d,2)} m</b></div><div><span>Talud (H : V)</span><b>${fm(z,2)} : 1</b></div>
+  <div><span>Volumen sin margen</span><b>${fm(V0,1)} m³</b></div><div><span>Volumen total</span><b>${fm(V,1)} m³</b></div>
+  </div></div></div>`;
+}
+$("rv_calc").onclick=()=>reservorio(true);
+["rv_vd","rv_aut","rv_mar","rv_prof","rv_tal","rv_rel"].forEach(i=>$(i).addEventListener("input",()=>reservorio(false)));
+$("rv_ej").onclick=()=>{ $("rv_vd").value="58,73"; $("rv_aut").value="10"; $("rv_mar").value="15"; $("rv_prof").value="2"; $("rv_tal").value="1"; $("rv_rel").value="1,83"; reservorio(true) };
+$("rv_lim").onclick=()=>{ ["rv_vd","rv_aut","rv_mar","rv_prof","rv_tal","rv_rel"].forEach(i=>$(i).value=""); reservorio(false) };
+</script>
+</body>
+</html>
